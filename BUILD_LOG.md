@@ -9,3 +9,5 @@
 - Wrote agent/INSTRUCTIONS.md (playbook for the Switch agent).
 - Next: human installs Switch Console, starts local server, creates `chateda` agent in this repo dir with INSTRUCTIONS.md, joins Mattermost room; hello round-trip, then live E2E.
 - Blocker (human-only): Console is a GUI install.
+- Nov 4: LIVE E2E PASS (analyze). Switch Console + local server + Mattermost + Claude Code (installed via npm after Console's installer hit a PowerShell InvalidEndOfLine bug). `@chateda analyze this` + sample.csv -> summary + 4 chart PNGs in Town Square. Agent dir = repo root, instructions via CLAUDE.md import.
+- Next: live-test follow-ups (breakdown, drop outliers, drivers), bad-file handling in chat; then README + demo script.
