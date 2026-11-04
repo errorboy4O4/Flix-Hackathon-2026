@@ -12,3 +12,6 @@
 - Nov 4: LIVE E2E PASS (analyze). Switch Console + local server + Mattermost + Claude Code (installed via npm after Console's installer hit a PowerShell InvalidEndOfLine bug). `@chateda analyze this` + sample.csv -> summary + 4 chart PNGs in Town Square. Agent dir = repo root, instructions via CLAUDE.md import.
 - Next: live-test follow-ups (breakdown, drop outliers, drivers), bad-file handling in chat; then README + demo script.
 - Nov 4: Live follow-ups PASS (breakdown by region, drop outliers + redo, drivers of churn). Gap found live: agent offered "breakdown on cleaned data" but only analyze had --drop-outliers. Added --drop-outliers to breakdown and drivers. 47 tests green.
+- Nov 4: Live error handling PASS (pdf, empty, headers-only, ragged, unknown column). Live cleaned-data follow-ups PASS (North lead 70.85 vs West 49.62 collapses to ~2 pts without outliers: the demo story). Note: Closing Console stops the Mattermost container; `docker start switchdash-local-mattermost-mattermost-1` recovers.
+- Wrote README (with "How Switch is used"), DEMO.md script. Verified setup in a fresh clone + venv: 47 tests green.
+- Remaining: record video, add video link to README, push to public GitHub (human), final review walkthrough, submit by Nov 7 18:00 IST. Feature freeze Nov 6 21:00.
