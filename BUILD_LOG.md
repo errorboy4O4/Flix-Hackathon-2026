@@ -15,3 +15,4 @@
 - Nov 4: Live error handling PASS (pdf, empty, headers-only, ragged, unknown column). Live cleaned-data follow-ups PASS (North lead 70.85 vs West 49.62 collapses to ~2 pts without outliers: the demo story). Note: Closing Console stops the Mattermost container; `docker start switchdash-local-mattermost-mattermost-1` recovers.
 - Wrote README (with "How Switch is used"), DEMO.md script. Verified setup in a fresh clone + venv: 47 tests green.
 - Remaining: record video, add video link to README, push to public GitHub (human), final review walkthrough, submit by Nov 7 18:00 IST. Feature freeze Nov 6 21:00.
+- Nov 4: Demo video recorded and uploaded (https://youtu.be/ywPKDwjTbZ8). README updated with link. Final checks: 47 tests green, no TODOs, secret scan clean, repo public, authors use noreply identity. Remaining: submit via the official form (deadline Nov 7 18:00 IST by plan) and human review walkthrough.

@@ -4,7 +4,7 @@
 
 Drop a CSV into a team chat room. A Claude Code agent, connected to the room by **Switch**, profiles the data, posts a plain-language summary plus charts, and keeps iterating with the team in the thread: *"break monthly charges down by region"*, *"drop the outliers and redo"*, *"what drives churn?"*. No notebooks, no waiting on the data team.
 
-> Demo video: **TODO: add link before submission**
+> **Demo video (YouTube):** <https://youtu.be/ywPKDwjTbZ8>
 
 ## The problem
 
