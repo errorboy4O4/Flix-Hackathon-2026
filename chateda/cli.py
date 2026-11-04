@@ -11,6 +11,8 @@ import threading
 from collections.abc import Callable
 from pathlib import Path
 
+import pandas as pd
+
 from chateda import charts, ops, report
 from chateda.config import Config
 from chateda.loader import ChatEdaError, load_csv
@@ -23,22 +25,29 @@ EXIT_TIMEOUT = 3
 EXIT_INTERNAL = 4
 
 
+def _load(path: Path, config: Config, drop_outliers: bool) -> tuple[pd.DataFrame, dict[str, int] | None]:
+    """Load the CSV; optionally drop IQR outlier rows and report what was removed."""
+    df = load_csv(path, config)
+    if not drop_outliers:
+        return df, None
+    mask, removed = ops.iqr_outlier_mask(df)
+    return df[~mask].reset_index(drop=True), removed
+
+
 def run_analyze(path: Path, config: Config, drop_outliers: bool = False) -> dict:
     """Overview EDA; optionally drop IQR outliers first and redo everything."""
-    df = load_csv(path, config)
-    removed = None
-    if drop_outliers:
-        mask, removed = ops.iqr_outlier_mask(df)
-        df = df[~mask].reset_index(drop=True)
+    df, removed = _load(path, config, drop_outliers)
     profile = build_profile(df)
     folder = _out_folder(config, path, "analyze_clean" if drop_outliers else "analyze")
     images = charts.overview_charts(df, profile, folder)
     return _result(report.overview_markdown(path.name, profile, removed), images)
 
 
-def run_breakdown(path: Path, config: Config, by: str, metric: str | None, agg: str) -> dict:
+def run_breakdown(
+    path: Path, config: Config, by: str, metric: str | None, agg: str, drop_outliers: bool = False
+) -> dict:
     """Summarize a metric (or row counts) per group of a column."""
-    df = load_csv(path, config)
+    df, removed = _load(path, config, drop_outliers)
     table = ops.breakdown(df, by, metric, agg)
     by = ops.require_column(df, by)
     folder = _out_folder(config, path, f"breakdown_{by}")
@@ -49,12 +58,12 @@ def run_breakdown(path: Path, config: Config, by: str, metric: str | None, agg: 
         str(table.columns[0]),
         folder / "breakdown.png",
     )
-    return _result(report.breakdown_markdown(by, table), [image])
+    return _result(report.breakdown_markdown(by, table, removed), [image])
 
 
-def run_drivers(path: Path, config: Config, target: str) -> dict:
+def run_drivers(path: Path, config: Config, target: str, drop_outliers: bool = False) -> dict:
     """Rank which columns relate most strongly to the target column."""
-    df = load_csv(path, config)
+    df, removed = _load(path, config, drop_outliers)
     ranked = ops.drivers(df, target)
     target = ops.require_column(df, target)
     folder = _out_folder(config, path, f"drivers_{target}")
@@ -70,7 +79,7 @@ def run_drivers(path: Path, config: Config, target: str) -> dict:
                 folder / "drivers.png",
             )
         )
-    return _result(report.drivers_markdown(target, ranked), images)
+    return _result(report.drivers_markdown(target, ranked, removed), images)
 
 
 def _out_folder(config: Config, path: Path, name: str) -> Path:
@@ -86,7 +95,6 @@ def _build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     analyze = sub.add_parser("analyze", help="overview EDA with charts")
     analyze.add_argument("file")
-    analyze.add_argument("--drop-outliers", action="store_true", help="remove IQR outliers, then redo")
     breakdown = sub.add_parser("breakdown", help="summarize a metric by a column")
     breakdown.add_argument("file")
     breakdown.add_argument("--by", required=True)
@@ -95,6 +103,8 @@ def _build_parser() -> argparse.ArgumentParser:
     drivers = sub.add_parser("drivers", help="which columns relate most to a target")
     drivers.add_argument("file")
     drivers.add_argument("--target", required=True)
+    for command in (analyze, breakdown, drivers):
+        command.add_argument("--drop-outliers", action="store_true", help="remove IQR outliers first")
     return parser
 
 
@@ -103,8 +113,8 @@ def _dispatch(args: argparse.Namespace, config: Config) -> Callable[[], dict]:
     if args.command == "analyze":
         return lambda: run_analyze(path, config, args.drop_outliers)
     if args.command == "breakdown":
-        return lambda: run_breakdown(path, config, args.by, args.metric, args.agg)
-    return lambda: run_drivers(path, config, args.target)
+        return lambda: run_breakdown(path, config, args.by, args.metric, args.agg, args.drop_outliers)
+    return lambda: run_drivers(path, config, args.target, args.drop_outliers)
 
 
 def _run_with_timeout(task: Callable[[], dict], seconds: float) -> dict | None:

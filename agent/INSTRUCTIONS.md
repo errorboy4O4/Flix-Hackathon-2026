@@ -18,6 +18,7 @@ Every command prints ONE JSON object: `{"ok": bool, "message": "<markdown>", "ch
 |---|---|
 | "break X down by Y", "average X per Y" | `breakdown "<path>" --by Y --metric X --agg mean` (agg: mean, median, sum, count; omit `--metric` to count rows) |
 | "drop the outliers and redo", "remove outliers" | `analyze "<path>" --drop-outliers` |
+| Any follow-up "on the cleaned data / without outliers" | add `--drop-outliers` to `breakdown` or `drivers` too |
 | "what predicts / drives / affects X?" | `drivers "<path>" --target X` |
 | "redo / show the overview again" | `analyze "<path>"` |
 

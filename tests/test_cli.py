@@ -100,3 +100,13 @@ def test_unexpected_exception_hides_stack_trace(monkeypatch: pytest.MonkeyPatch,
     out = json.loads(capsys.readouterr().out)
     assert code == cli.EXIT_INTERNAL and "secret internals" not in out["message"]
     assert "secret internals" in caplog.text
+
+
+def test_breakdown_and_drivers_accept_drop_outliers(tmp_path: Path, sample_path: Path):
+    _, plain = run_cli(tmp_path, "breakdown", str(sample_path), "--by", "region", "--metric", "monthly_charges")
+    code, clean = run_cli(
+        tmp_path, "breakdown", str(sample_path), "--by", "region", "--metric", "monthly_charges", "--drop-outliers"
+    )
+    assert code == 0 and "Outliers removed" in clean["message"] and "Outliers removed" not in plain["message"]
+    code, drivers = run_cli(tmp_path, "drivers", str(sample_path), "--target", "churn", "--drop-outliers")
+    assert code == 0 and "Outliers removed" in drivers["message"]

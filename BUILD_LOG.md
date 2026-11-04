@@ -11,3 +11,4 @@
 - Blocker (human-only): Console is a GUI install.
 - Nov 4: LIVE E2E PASS (analyze). Switch Console + local server + Mattermost + Claude Code (installed via npm after Console's installer hit a PowerShell InvalidEndOfLine bug). `@chateda analyze this` + sample.csv -> summary + 4 chart PNGs in Town Square. Agent dir = repo root, instructions via CLAUDE.md import.
 - Next: live-test follow-ups (breakdown, drop outliers, drivers), bad-file handling in chat; then README + demo script.
+- Nov 4: Live follow-ups PASS (breakdown by region, drop outliers + redo, drivers of churn). Gap found live: agent offered "breakdown on cleaned data" but only analyze had --drop-outliers. Added --drop-outliers to breakdown and drivers. 47 tests green.
